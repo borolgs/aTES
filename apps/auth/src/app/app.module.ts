@@ -38,7 +38,7 @@ import { OAuth2Module } from '@shared/oauth2';
       useFactory: (options: KafkaConfig, config: AuthConfig) => ({
         options,
         mock: config.MOCK_MB,
-        topics: ['user-stream'],
+        topics: ['account-stream'],
       }),
     }),
     OAuth2Module.registerAsync({
