@@ -1,0 +1,55 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjIsImlhdCI6MTY2NTkyNjAzOCwiZXhwIjoxNjY2MDEyNDM4fQ.ra5J9VjrB34yPRwHP6ydUZmsG3bW6rf_DJg474NCVWg
+
+# create user
+# pupa@mail.com qwerty
+# igor@mail.com boss
+POST {{baseUrl}}/accounts
+Content-Type: application/json 
+
+{
+  "name": "igor",
+  "email": "igor@mail.com",
+  "password": "boss",
+  "role": "manager"
+}
+
+###
+
+GET {{baseUrl}}/accounts
+Authorization: Bearer {{token}} 
+
+### 
+
+PATCH {{baseUrl}}/accounts/3e66f9c3-ca38-4039-8f3b-cb6693e341df
+Content-Type: application/json 
+Authorization: Bearer {{token}} 
+
+{
+  "name": "IGOR",
+  "role": "admin"
+}
+
+###
+
+DELETE {{baseUrl}}/accounts/280d5109-0337-408a-a7c0-b3dc978b8202
+Authorization: Bearer {{token}} 
+
+###
+
+# create client app
+POST {{baseUrl}}/apps
+Content-Type: application/json 
+Authorization: Bearer {{token}} 
+
+{
+  "name": "auth-app",
+  "baseUrl": "http://localhost:4000",
+  "callbackUrl": "http://localhost:4000/login/callback"
+}
+
+###
+
+# client apps
+GET {{baseUrl}}/apps
+Authorization: Bearer {{token}} 
