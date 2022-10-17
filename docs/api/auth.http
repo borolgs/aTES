@@ -1,17 +1,25 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjIsImlhdCI6MTY2NTkyNjAzOCwiZXhwIjoxNjY2MDEyNDM4fQ.ra5J9VjrB34yPRwHP6ydUZmsG3bW6rf_DJg474NCVWg
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjY1OTg1NjE5LCJleHAiOjE2NjYwNzIwMTl9.IUU-xMABSig3ETuQHAHeOGLojcpfgRIVNzzAk51aj8c
+
+###
+
+# get token
+GET {{baseUrl}}/login
+
+### 
 
 # create user
 # pupa@mail.com qwerty
 # igor@mail.com boss
 POST {{baseUrl}}/accounts
-Content-Type: application/json 
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "igor",
   "email": "igor@mail.com",
   "password": "boss",
-  "role": "manager"
+  "role": "admin"
 }
 
 ###
