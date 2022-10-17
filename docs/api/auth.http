@@ -6,6 +6,8 @@
 # get token
 GET {{baseUrl}}/login
 
+### 
+
 # create user
 # pupa@mail.com qwerty
 # igor@mail.com boss

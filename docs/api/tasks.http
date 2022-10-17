@@ -2,7 +2,7 @@
 @baseUrl = http://localhost:4000
 
 # get token using http://localhost:4000/login
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjIsImlhdCI6MTY2NTkyNjAzOCwiZXhwIjoxNjY2MDEyNDM4fQ.ra5J9VjrB34yPRwHP6ydUZmsG3bW6rf_DJg474NCVWg
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjY1OTg1NjE5LCJleHAiOjE2NjYwNzIwMTl9.IUU-xMABSig3ETuQHAHeOGLojcpfgRIVNzzAk51aj8c
 
 ###
 
@@ -11,7 +11,7 @@ GET {{baseUrl}}/login
 
 ###
 
-GET {{baseUrl}}/tasks?status=done
+GET {{baseUrl}}/tasks
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 
