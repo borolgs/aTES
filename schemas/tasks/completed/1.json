@@ -1,0 +1,33 @@
+{
+  "title": "Tasks.Completed.v1",
+  "description": "json schema for BE Task Completed (version 1)",
+
+  "$defs": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "assigneeId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["assigneeId", "description"]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "eventId": { "type": "string" },
+    "eventVersion": { "enum": [1] },
+    "eventName": { "enum": ["TaskCompleted"] },
+    "eventTime": { "type": "string" },
+    "producer": { "type": "string" },
+
+    "data": { "$ref": "#/$defs/event_data" }
+  },
+
+  "required": ["eventId", "eventVersion", "eventName", "eventTime", "producer", "data"]
+}

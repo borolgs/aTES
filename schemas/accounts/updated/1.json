@@ -1,0 +1,40 @@
+{
+  "title": "Accounts.Updated.v1",
+  "description": "json schema for CUD account events (version 1)",
+
+  "$defs": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "publicId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "manager", "accountant", "user"]
+        }
+      },
+      "required": ["publicId", "email", "name", "role"]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "eventId": { "type": "string" },
+    "eventVersion": { "enum": [1] },
+    "eventName": { "enum": ["AccountUpdated"] },
+    "eventTime": { "type": "string" },
+    "producer": { "type": "string" },
+
+    "data": { "$ref": "#/$defs/event_data" }
+  },
+
+  "required": ["eventId", "eventVersion", "eventName", "eventTime", "producer", "data"]
+}

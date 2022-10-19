@@ -1,0 +1,37 @@
+{
+  "title": "Tasks.Created.v1",
+  "description": "json schema for CUD task events (version 1)",
+
+  "$defs": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "publicId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["todo", "in-progess", "done"]
+        }
+      },
+      "required": ["publicId", "description", "status"]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "eventId": { "type": "string" },
+    "eventVersion": { "enum": [1] },
+    "eventName": { "enum": ["TaskCreated"] },
+    "eventTime": { "type": "string" },
+    "producer": { "type": "string" },
+
+    "data": { "$ref": "#/$defs/event_data" }
+  },
+
+  "required": ["eventId", "eventVersion", "eventName", "eventTime", "producer", "data"]
+}
