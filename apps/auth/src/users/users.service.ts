@@ -1,16 +1,19 @@
-import { ForbiddenException, Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventSchemaRegistryService } from '@shared/event-schema-registry';
 import { ClientKafkaService } from '@shared/kafka';
 import { Repository } from 'typeorm';
 import { FindUsersResponse, IUser } from '../types';
 import { User } from './users.entity';
+import { UserEvent } from './events/users.events';
 
 @Injectable()
 export class UsersService {
   private logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    private schemaRegistry: EventSchemaRegistryService,
     private client: ClientKafkaService,
   ) {}
 
@@ -27,14 +30,20 @@ export class UsersService {
   async create(args: Omit<IUser, 'publicId'>) {
     const user = await this.userRepo.findOneBy({ email: args.email });
     if (user) {
-      throw new ForbiddenException(`Email ${args.email} already exists`);
+      throw new BadRequestException(`Email ${args.email} already exists`);
     }
+
     const created = this.userRepo.create(args);
     await this.userRepo.save(created);
-    await this.client.emit('account-stream', {
-      name: 'AccountCreated',
-      data: created,
-    });
+
+    await UserEvent.createUserCreatedEvent('account-stream', created)
+      .andThen((event) => this.schemaRegistry.validate(event, 'accounts.created', 1))
+      .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+      .map((e) => e as UserEvent<IUser>)
+      .asyncMap(({ topic, event }) => {
+        return this.client.emit(topic, event);
+      });
+
     this.logger.debug(`User ${created.email} created`);
     return created;
   }
@@ -66,10 +75,15 @@ export class UsersService {
   async update({ publicId, ...args }: Partial<IUser> & Pick<User, 'publicId'>) {
     const updated = await this.findOne({ publicId });
     await this.userRepo.save(Object.assign(updated, args));
-    await this.client.emit('account-stream', {
-      name: 'AccountUpdated',
-      data: updated,
-    });
+
+    await UserEvent.createUserUpdatedEvent('account-stream', updated)
+      .andThen((event) => this.schemaRegistry.validate(event, 'accounts.updated', 1))
+      .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+      .map((e) => e as UserEvent<IUser>)
+      .asyncMap(({ topic, event }) => {
+        return this.client.emit(topic, event);
+      });
+
     this.logger.debug(`User ${updated.email} updated`);
     return updated;
   }
@@ -77,10 +91,15 @@ export class UsersService {
   async delete({ publicId }: Pick<IUser, 'publicId'>) {
     const deleted = await this.findOne({ publicId });
     await this.userRepo.remove(deleted);
-    await this.client.emit('account-stream', {
-      name: 'AccountDeleted',
-      data: deleted,
-    });
+
+    await UserEvent.createUserDeletedEvent('account-stream', deleted)
+      .andThen((event) => this.schemaRegistry.validate(event, 'accounts.deleted', 1))
+      .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+      .map((e) => e as UserEvent<IUser>)
+      .asyncMap(({ topic, event }) => {
+        return this.client.emit(topic, event);
+      });
+
     this.logger.debug(`User ${deleted.email} deleted`);
     return deleted;
   }
