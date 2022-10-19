@@ -1,11 +1,12 @@
 import { Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../users';
 import { DeleteTaskCommand } from './tasks.commands';
 import { Task } from '../task.entity';
-import { ClientKafkaService } from '@shared/kafka';
+import { TaskEvent } from '../events';
+import { EventSchemaRegistryService } from '@shared/event-schema-registry';
 
 @CommandHandler(DeleteTaskCommand)
 export class DeleteTaskHandler implements ICommandHandler<DeleteTaskCommand> {
@@ -14,7 +15,8 @@ export class DeleteTaskHandler implements ICommandHandler<DeleteTaskCommand> {
     @InjectRepository(Task) private taskRepo: Repository<Task>,
 
     @InjectRepository(User) private userRepo: Repository<User>,
-    private client: ClientKafkaService,
+    private eventBus: EventBus,
+    private schemaRegistry: EventSchemaRegistryService,
   ) {}
 
   async execute({ payload: { taskId } }: DeleteTaskCommand): Promise<any> {
@@ -23,10 +25,12 @@ export class DeleteTaskHandler implements ICommandHandler<DeleteTaskCommand> {
       throw new NotFoundException(`Task ${taskId} doesn't exist`);
     }
     await this.taskRepo.remove(deleted);
-    await this.client.emit('task-stream', {
-      name: 'TaskDeleted',
-      data: deleted,
-    });
+
+    await TaskEvent.createTaskDeletedEvent('task-stream', deleted)
+      .andThen((event) => this.schemaRegistry.validate(event, 'tasks.deleted', 1))
+      .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+      .asyncMap((event) => this.eventBus.publish(event));
+
     this.logger.debug(`Task ${deleted.description} deleted`);
     return deleted;
   }

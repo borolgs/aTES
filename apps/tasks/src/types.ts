@@ -15,7 +15,11 @@ export interface IUser {
 }
 
 export type UserCreatedEvent = {
-  name: 'AccountCreated' | 'AccountUpdated' | 'AccountDeleted';
+  eventId: string;
+  eventVersion: number;
+  eventName: 'AccountCreated' | 'AccountUpdated' | 'AccountDeleted';
+  eventTime: string;
+  producer: string;
   data: IUser;
 };
 

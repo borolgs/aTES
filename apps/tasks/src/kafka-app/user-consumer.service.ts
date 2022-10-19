@@ -14,7 +14,7 @@ export class UsersConsumerService {
     @InjectRepository(Task) private taskRepo: Repository<Task>,
   ) {}
   async consume(event: UserCreatedEvent) {
-    switch (event.name) {
+    switch (event.eventName) {
       case 'AccountCreated':
         const created = this.userRepo.create(event.data);
         await this.userRepo.save(created);

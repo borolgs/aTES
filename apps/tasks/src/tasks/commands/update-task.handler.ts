@@ -1,11 +1,12 @@
 import { Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../users';
 import { UpdateTaskCommand } from './tasks.commands';
 import { Task } from '../task.entity';
-import { ClientKafkaService } from '@shared/kafka';
+import { EventSchemaRegistryService } from '@shared/event-schema-registry';
+import { TaskEvent } from '../events';
 
 @CommandHandler(UpdateTaskCommand)
 export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
@@ -14,12 +15,11 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
     @InjectRepository(Task) private taskRepo: Repository<Task>,
 
     @InjectRepository(User) private userRepo: Repository<User>,
-    private client: ClientKafkaService,
+    private eventBus: EventBus,
+    private schemaRegistry: EventSchemaRegistryService,
   ) {}
 
-  async execute({
-    payload: { taskId, assigneeId, ...args },
-  }: UpdateTaskCommand): Promise<any> {
+  async execute({ payload: { taskId, assigneeId, ...args } }: UpdateTaskCommand): Promise<any> {
     const task = await this.taskRepo.findOne({
       where: { publicId: taskId },
       relations: ['assignee'],
@@ -41,29 +41,31 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
     await this.taskRepo.save(Object.assign(task, args));
 
     if (isDone) {
-      await this.client.emit('task', {
-        name: 'TaskCompleted',
-        data: {
-          description: task.description,
-          assigneeId: task.assignee?.publicId,
-        },
-      });
+      await TaskEvent.createTaskCompletedEvent('task', {
+        description: task.description,
+        assigneeId: task.assignee!.publicId,
+      })
+        .andThen((event) => this.schemaRegistry.validate(event, 'tasks.completed', 1))
+        .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+        .asyncMap((event) => this.eventBus.publish(event));
+
       this.logger.debug(`Task ${task.description} completed`);
     } else if (newAssignee) {
-      await this.client.emit('task', {
-        name: 'TaskAssigned',
-        data: {
-          description: task.description,
-          assigneeId: newAssignee.publicId,
-        },
-      });
+      await TaskEvent.createTaskAssignedEvent('task', {
+        description: task.description,
+        assigneeId: newAssignee.publicId,
+      })
+        .andThen((event) => this.schemaRegistry.validate(event, 'tasks.assigned', 1))
+        .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+        .asyncMap((event) => this.eventBus.publish(event));
+
       this.logger.debug(`Task ${task.description} assigned`);
     }
 
-    await this.client.emit('task-stream', {
-      name: 'TaskUpdated',
-      data: task,
-    });
+    await TaskEvent.createTaskUpdatedEvent('task-stream', task)
+      .andThen((event) => this.schemaRegistry.validate(event.event, 'tasks.updated', 1).map(() => event))
+      .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+      .asyncMap((event) => this.eventBus.publish(event));
 
     this.logger.debug(`Task ${task.description} updated`);
 
