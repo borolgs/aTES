@@ -3,8 +3,9 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/auth/src",
   "compilerOptions": {
-    "webpack": true,
-    "tsConfigPath": "apps/auth/tsconfig.app.json"
+    "tsConfigPath": "apps/auth/tsconfig.app.json",
+    "assets": ["**/*.json"],
+    "watchAssets": true
   },
   "monorepo": true,
   "root": "apps/auth",
