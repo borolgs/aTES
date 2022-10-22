@@ -36,6 +36,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
+    },
+    "accounting": {
+      "type": "application",
+      "root": "apps/accounting",
+      "entryFile": "main",
+      "sourceRoot": "apps/accounting/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/accounting/tsconfig.app.json"
+      }
     }
   }
 }

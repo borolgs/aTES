@@ -34,6 +34,7 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
       if (!newAssignee) {
         throw new NotFoundException(`User ${newAssignee} doesn't exist`);
       }
+      task.assignee = newAssignee;
     }
 
     const isDone = args.status === 'done' && args.status !== task.status;
@@ -51,6 +52,7 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
 
       this.logger.debug(`Task ${task.description} completed`);
     } else if (newAssignee) {
+      await this.userRepo.save(newAssignee);
       await TaskEvent.createTaskAssignedEvent('task', {
         description: task.description,
         assigneeId: newAssignee.publicId,

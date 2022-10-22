@@ -7,12 +7,11 @@ export const kafkaConfig = registerAs(
     transport: Transport.KAFKA,
     options: {
       client: {
-        clientId: process.env.KAFKA_CLIENT_ID ?? 'auth',
+        clientId: process.env.KAFKA_CLIENT_ID ?? 'accounting',
         brokers: [process.env.KAFKA_BROKER ?? 'localhost:29092'],
       },
       consumer: {
-        groupId: process.env.KAFKA_GROUP_ID ?? '1',
-        allowAutoTopicCreation: true,
+        groupId: process.env.KAFKA_GROUP_ID ?? '3',
       },
     },
   }),
