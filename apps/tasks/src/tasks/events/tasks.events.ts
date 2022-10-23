@@ -48,6 +48,18 @@ export class TaskEvent<T> implements IEvent<T> {
     return ok(new TaskEvent(topic, eventWithMetadata));
   }
 
+  public static createTaskCreatedEventV2(topic: string, event: ITask) {
+    const eventWithMetadata: Event<ITask> = {
+      eventId: crypto.randomUUID(),
+      eventVersion: 2,
+      eventName: 'TaskCreated',
+      eventTime: new Date().toISOString(),
+      producer: 'tasks-tream',
+      data: event,
+    };
+    return ok(new TaskEvent(topic, eventWithMetadata));
+  }
+
   public static createTaskUpdatedEvent(topic: string, event: ITask) {
     const eventWithMetadata: Event<ITask> = {
       eventId: crypto.randomUUID(),
