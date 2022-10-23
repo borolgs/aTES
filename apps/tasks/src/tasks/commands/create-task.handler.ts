@@ -48,11 +48,6 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
       .mapErr((err) => this.logger.error(err.message, err.validationErrors))
       .asyncMap((event) => this.eventBus.publish(event));
 
-    await TaskEvent.createTaskCreatedEvent('task-stream', task)
-      .andThen((event) => this.schemaRegistry.validate(event.event, 'tasks.created', 1).map(() => event))
-      .mapErr((err) => this.logger.error(err.message, err.validationErrors))
-      .asyncMap((event) => this.eventBus.publish(event));
-
     await TaskEvent.createTaskCreatedEventV2('task-stream', task)
       .andThen((event) => this.schemaRegistry.validate(event.event, 'tasks.created', 2).map(() => event))
       .mapErr((err) => this.logger.error(err.message, err.validationErrors))
