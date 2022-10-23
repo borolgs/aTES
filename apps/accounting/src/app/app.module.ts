@@ -1,22 +1,23 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
-import { TasksModule } from '../tasks';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AsyncContextModule } from '@nestjs-steroids/async-context';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { AsyncCtxInterceptor, HttpLogInterceptor } from '@shared/interseptors';
+import { HttpLogInterceptor } from '@shared/interseptors';
 import { OAuth2Module } from '@shared/oauth2';
-import { UsersModule } from '../users';
 import { KafkaAppModule } from '../kafka-app/kafka-app.module';
 import { ClientKafkaModule, ClientKafkaService } from '@shared/kafka';
-import { KafkaConfig, kafkaConfig, AccountingConfig, accountingConfig } from '../config';
+import { KafkaConfig, kafkaConfig, AccountingConfig, accountingConfig, kafkaAssignConsumerConfig } from '../config';
 import { CqrsModule, EventBus } from '@nestjs/cqrs';
 import { EventSchemaRegistryModule } from '@shared/event-schema-registry';
+import { EntitiesModule } from '../entities';
+import { AccountingModule } from '../accounting';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [accountingConfig, kafkaConfig] }),
+    ConfigModule.forRoot({ isGlobal: true, load: [accountingConfig, kafkaConfig, kafkaAssignConsumerConfig] }),
     AsyncContextModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [accountingConfig.KEY],
@@ -50,18 +51,15 @@ import { EventSchemaRegistryModule } from '@shared/event-schema-registry';
         host: config.ACCOUNTING_AUTH_HOST,
       }),
     }),
+    ScheduleModule.forRoot(),
     EventSchemaRegistryModule.forRoot({}),
     CqrsModule,
     KafkaAppModule,
-    UsersModule,
-    TasksModule,
+    EntitiesModule,
+    AccountingModule,
   ],
   controllers: [AppController],
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: AsyncCtxInterceptor,
-    },
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpLogInterceptor,

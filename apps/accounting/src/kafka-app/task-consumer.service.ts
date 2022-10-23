@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Task } from '../tasks';
-import { TaskCreatedEvent } from '../types';
-import { User } from '../users';
+import { Task, User } from '../entities';
+import { TaskCUDEvent } from '../types';
 
 @Injectable()
 export class TaskConsumerService {
@@ -13,7 +12,7 @@ export class TaskConsumerService {
     @InjectRepository(Task) private taskRepo: Repository<Task>,
     @InjectRepository(User) private userRepo: Repository<User>,
   ) {}
-  async consume(event: TaskCreatedEvent) {
+  async consume(event: TaskCUDEvent) {
     switch (event.eventName) {
       case 'TaskCreated':
         {

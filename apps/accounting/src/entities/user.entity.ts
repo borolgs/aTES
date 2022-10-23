@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Task } from '../tasks';
+import { Task } from './task.entity';
+import { Transaction } from './transaction.entity';
 import { IUser } from '../types';
 
 @Entity()
@@ -19,7 +20,10 @@ export class User {
   @OneToMany(() => Task, (task) => task.assignee, { cascade: ['remove'] })
   tasks: Task[];
 
-  @Column('bigint', { default: 0 })
+  @OneToMany(() => Transaction, (transaction) => transaction.account)
+  transactions: Transaction[];
+
+  @Column('integer', { default: 0 })
   balance: number;
 
   toJSON(): IUser {

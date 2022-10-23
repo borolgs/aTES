@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, Generated, ManyToOne, BaseEntity, BeforeInsert } from 'typeorm';
+import { User } from './user.entity';
 import { ITask } from '../types';
-import { User } from '../users';
 
 @Entity()
 export class Task extends BaseEntity {
@@ -17,10 +17,10 @@ export class Task extends BaseEntity {
   @ManyToOne(() => User, (user) => user.tasks, { nullable: true })
   assignee: User | null;
 
-  @Column('bigint', { default: 0 })
+  @Column('integer', { default: 0 })
   price: number;
 
-  @Column('bigint', { default: 0 })
+  @Column('integer', { default: 0 })
   fee: number;
 
   toJSON(): ITask {
@@ -28,6 +28,8 @@ export class Task extends BaseEntity {
       publicId: this.publicId,
       description: this.description,
       assignee: this.assignee,
+      price: this.price,
+      fee: this.fee,
     };
   }
 
