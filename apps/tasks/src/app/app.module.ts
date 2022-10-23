@@ -5,7 +5,7 @@ import { TasksModule } from '../tasks';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AsyncContextModule } from '@nestjs-steroids/async-context';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { AsyncCtxInterceptor, HttpLogInterceptor } from '@shared/interseptors';
+import { HttpLogInterceptor } from '@shared/interseptors';
 import { OAuth2Module } from '@shared/oauth2';
 import { UsersModule } from '../users';
 import { KafkaAppModule } from '../kafka-app/kafka-app.module';
@@ -58,10 +58,6 @@ import { EventSchemaRegistryModule } from '@shared/event-schema-registry';
   ],
   controllers: [AppController],
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: AsyncCtxInterceptor,
-    },
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpLogInterceptor,

@@ -8,7 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { AsyncCtxInterceptor, HttpLogInterceptor } from '@shared/interseptors';
+import { HttpLogInterceptor } from '@shared/interseptors';
 import { ClientAppsModule } from '../client-apps';
 import { OAuth2Module } from '@shared/oauth2';
 import { EventSchemaRegistryModule } from '@shared/event-schema-registry';
@@ -57,10 +57,6 @@ import { EventSchemaRegistryModule } from '@shared/event-schema-registry';
   ],
   controllers: [AppController],
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: AsyncCtxInterceptor,
-    },
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpLogInterceptor,
