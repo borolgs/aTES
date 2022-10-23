@@ -11,6 +11,12 @@ export class Task extends BaseEntity {
   @Generated('uuid')
   publicId: string;
 
+  @Column({ nullable: true })
+  title: string;
+
+  @Column({ nullable: true })
+  jiraId: string;
+
   @Column()
   description: string;
 

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventSchemaRegistryService } from '@shared/event-schema-registry';
 import { Repository } from 'typeorm';
 import { Task, User } from '../entities';
 import { TaskCUDEvent } from '../types';
@@ -11,11 +12,21 @@ export class TaskConsumerService {
   constructor(
     @InjectRepository(Task) private taskRepo: Repository<Task>,
     @InjectRepository(User) private userRepo: Repository<User>,
+    private schemaRegistry: EventSchemaRegistryService,
   ) {}
   async consume(event: TaskCUDEvent) {
     switch (event.eventName) {
       case 'TaskCreated':
+        if (event.eventVersion !== 2) {
+          break;
+        }
         {
+          const validationResult = this.schemaRegistry.validate(event, 'tasks.created', 2);
+          if (validationResult.isErr()) {
+            // TODO: emit event to DLQ topic
+            this.logger.error(validationResult.error.validationErrors);
+            break;
+          }
           const { assignee: assignee, ...data } = event.data;
           const created = this.taskRepo.create(data);
           if (assignee) {

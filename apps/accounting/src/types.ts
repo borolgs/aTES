@@ -28,6 +28,8 @@ export type TaskId = string;
 export interface ITask {
   publicId: TaskId;
   assignee: IUser | null;
+  title?: string;
+  jiraId?: string;
   description: string;
   price: number;
   fee: number;
