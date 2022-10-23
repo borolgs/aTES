@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  Generated,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Generated, ManyToOne } from 'typeorm';
 import { ITask, TaskStatus, taskStatuses } from '../types';
 import { User } from '../users';
 
@@ -16,6 +10,12 @@ export class Task {
   @Column()
   @Generated('uuid')
   publicId: string;
+
+  @Column({ nullable: true })
+  title: string;
+
+  @Column({ nullable: true })
+  jiraId: string;
 
   @Column()
   description: string;
