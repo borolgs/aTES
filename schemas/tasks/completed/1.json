@@ -6,6 +6,9 @@
     "event_data": {
       "type": "object",
       "properties": {
+        "taskId": {
+          "type": "string"
+        },
         "assigneeId": {
           "type": "string"
         },
@@ -13,7 +16,7 @@
           "type": "string"
         }
       },
-      "required": ["assigneeId", "description"]
+      "required": ["taskId", "assigneeId", "description"]
     }
   },
 

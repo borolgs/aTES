@@ -1,10 +1,11 @@
 import { Event, IEvent } from '@shared/cqrs';
 import * as crypto from 'crypto';
 import { ok } from 'neverthrow';
-import { ITask, UserId } from '../../types';
+import { ITask, TaskId, UserId } from '../../types';
 
 export type TaskAssignedEventData = {
   description: string;
+  taskId: TaskId;
   assigneeId: UserId;
 };
 

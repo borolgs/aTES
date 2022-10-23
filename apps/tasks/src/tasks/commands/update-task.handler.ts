@@ -43,6 +43,7 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
 
     if (isDone) {
       await TaskEvent.createTaskCompletedEvent('task', {
+        taskId: task.publicId,
         description: task.description,
         assigneeId: task.assignee!.publicId,
       })
@@ -54,6 +55,7 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
     } else if (newAssignee) {
       await this.userRepo.save(newAssignee);
       await TaskEvent.createTaskAssignedEvent('task', {
+        taskId: task.publicId,
         description: task.description,
         assigneeId: newAssignee.publicId,
       })

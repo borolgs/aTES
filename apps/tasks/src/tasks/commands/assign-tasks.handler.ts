@@ -50,6 +50,7 @@ export class AssignTasksHandler implements ICommandHandler<AssignTasksCommand> {
         await manager.save(user);
 
         TaskEvent.createTaskAssignedEvent('task', {
+          taskId: task.publicId,
           description: task.description,
           assigneeId: user.publicId,
         }).map(({ event }) => events.push(event));

@@ -38,6 +38,7 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
     await this.userRepo.save(user);
 
     const taskAssigned = {
+      taskId: task.publicId,
       description: task.description,
       assigneeId: user.publicId,
     };

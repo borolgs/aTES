@@ -6,6 +6,9 @@
     "event_data": {
       "type": "object",
       "properties": {
+        "taskId": {
+          "type": "string"
+        },
         "assigneeId": {
           "type": "string"
         },
@@ -13,7 +16,7 @@
           "type": "string"
         }
       },
-      "required": ["assigneeId", "description"]
+      "required": ["taskId", "assigneeId", "description"]
     }
   },
 
@@ -29,12 +32,5 @@
     "data": { "$ref": "#/$defs/event_data" }
   },
 
-  "required": [
-    "eventId",
-    "eventVersion",
-    "eventName",
-    "eventTime",
-    "producer",
-    "data"
-  ]
+  "required": ["eventId", "eventVersion", "eventName", "eventTime", "producer", "data"]
 }
