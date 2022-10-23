@@ -33,6 +33,8 @@ export class Task {
   toJSON(): ITask {
     return {
       publicId: this.publicId,
+      title: this.title,
+      jiraId: this.jiraId,
       description: this.description,
       status: this.status,
       assignee: this.assignee,

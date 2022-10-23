@@ -35,6 +35,8 @@ export type TaskStatus = typeof taskStatuses[number];
 export interface ITask {
   publicId: TaskId;
   assignee: IUser | null;
+  title?: string;
+  jiraId?: string;
   description: string;
   status: TaskStatus;
 }
@@ -48,6 +50,8 @@ export type FindTasksResponse = {
 
 export interface CreateTaskParameters {
   assigneeId?: UserId;
+  title?: string;
+  jiraId?: string;
   description: string;
   status?: TaskStatus;
 }

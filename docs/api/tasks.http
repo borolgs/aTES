@@ -22,6 +22,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}} 
 
 {
+  "title": "some task",
+  "jiraId": "1",
   "description": "do something"
 }
 
