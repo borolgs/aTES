@@ -1,16 +1,18 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { TasksModule } from '../tasks';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AsyncContextModule } from '@nestjs-steroids/async-context';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { AsyncCtxInterceptor, HttpLogInterceptor } from '@shared/interseptors';
+import { HttpLogInterceptor } from '@shared/interseptors';
 import { OAuth2Module } from '@shared/oauth2';
 import { UsersModule } from '../users';
 import { KafkaAppModule } from '../kafka-app/kafka-app.module';
-import { ClientKafkaModule } from '@shared/kafka';
+import { ClientKafkaModule, ClientKafkaService } from '@shared/kafka';
 import { KafkaConfig, kafkaConfig, TasksConfig, tasksConfig } from '../config';
+import { CqrsModule, EventBus } from '@nestjs/cqrs';
+import { EventSchemaRegistryModule } from '@shared/event-schema-registry';
 
 @Module({
   imports: [
@@ -38,7 +40,6 @@ import { KafkaConfig, kafkaConfig, TasksConfig, tasksConfig } from '../config';
       useFactory: (options: KafkaConfig, config: TasksConfig) => ({
         options,
         mock: config.MOCK_MB,
-        topics: ['user-stream', 'task-stream', 'task'],
       }),
     }),
     OAuth2Module.registerAsync({
@@ -49,6 +50,8 @@ import { KafkaConfig, kafkaConfig, TasksConfig, tasksConfig } from '../config';
         host: config.TASKS_AUTH_HOST,
       }),
     }),
+    EventSchemaRegistryModule.forRoot({}),
+    CqrsModule,
     KafkaAppModule,
     UsersModule,
     TasksModule,
@@ -57,12 +60,15 @@ import { KafkaConfig, kafkaConfig, TasksConfig, tasksConfig } from '../config';
   providers: [
     {
       provide: APP_INTERCEPTOR,
-      useClass: AsyncCtxInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
       useClass: HttpLogInterceptor,
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private readonly event$: EventBus, private readonly kafkaPublisher: ClientKafkaService) {}
+
+  async onModuleInit(): Promise<any> {
+    this.kafkaPublisher.subscribeAndConnect(['account-stream', 'task-stream', 'task']);
+    this.event$.publisher = this.kafkaPublisher;
+  }
+}

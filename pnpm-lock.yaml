@@ -12,10 +12,12 @@ specifiers:
   '@nestjs/microservices': ^9.1.2
   '@nestjs/platform-express': ^9.0.0
   '@nestjs/platform-fastify': ^9.1.4
+  '@nestjs/schedule': ^2.1.0
   '@nestjs/schematics': ^9.0.0
   '@nestjs/testing': ^9.0.0
   '@nestjs/typeorm': ^9.0.1
   '@types/bcryptjs': ^2.4.2
+  '@types/cron': ^2.0.0
   '@types/express': ^4.17.13
   '@types/jest': 28.1.8
   '@types/jsonwebtoken': ^8.5.9
@@ -32,6 +34,7 @@ specifiers:
   jest: 28.1.3
   jsonwebtoken: ^8.5.1
   kafkajs: ^2.2.0
+  neverthrow: ^5.0.1
   pg: ^8.8.0
   prettier: ^2.3.2
   reflect-metadata: ^0.1.13
@@ -57,12 +60,14 @@ dependencies:
   '@nestjs/microservices': 9.1.2_jigou33zpm7azz42c3f4huz23i
   '@nestjs/platform-express': 9.1.2_umdjpi6fqr4wvw73r3mhthbyle
   '@nestjs/platform-fastify': 9.1.4_i4tp3onqu6wvmxq7vnpjzu2i3e
+  '@nestjs/schedule': 2.1.0_yzammjd3rtddjrgcr4enkpfvhm
   '@nestjs/typeorm': 9.0.1_tmxlb3yhjw2abskzijl7fav4b4
   ajv: 8.11.0
   bcryptjs: 2.4.3
   fastify: 4.7.0
   jsonwebtoken: 8.5.1
   kafkajs: 2.2.0
+  neverthrow: 5.0.1
   pg: 8.8.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -74,6 +79,7 @@ devDependencies:
   '@nestjs/schematics': 9.0.3_typescript@4.8.3
   '@nestjs/testing': 9.1.2_cherm4qzjl4a4kqaywetgn3yiy
   '@types/bcryptjs': 2.4.2
+  '@types/cron': 2.0.0
   '@types/express': 4.17.14
   '@types/jest': 28.1.8
   '@types/jsonwebtoken': 8.5.9
@@ -1181,6 +1187,20 @@ packages:
       - supports-color
     dev: false
 
+  /@nestjs/schedule/2.1.0_yzammjd3rtddjrgcr4enkpfvhm:
+    resolution: {integrity: sha512-4Xaw56WiW3VsxEPPnj/iDtfjcO+sUZyYAeRxD0gnF5havncxjAnv52Iw7UH3DuzzUA784xPGgGje3Fq0Gu925g==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0
+      '@nestjs/core': ^7.0.0 || ^8.0.0 || ^9.0.0
+      reflect-metadata: ^0.1.12
+    dependencies:
+      '@nestjs/common': 9.1.2_j5hagqx4mwzscud4kyjdvubauy
+      '@nestjs/core': 9.1.2_am2rguqqabwqcpzg5mrvm4oz54
+      cron: 2.0.0
+      reflect-metadata: 0.1.13
+      uuid: 8.3.2
+    dev: false
+
   /@nestjs/schematics/9.0.3_qul7ung6gmj6jydd3dgpqap7gu:
     resolution: {integrity: sha512-kZrU/lrpVd2cnK8I3ibDb3Wi1ppl3wX3U3lVWoL+DzRRoezWKkh8upEL4q0koKmuXnsmLiu3UPxFeMOrJV7TSA==}
     peerDependencies:
@@ -1376,6 +1396,13 @@ packages:
     resolution: {integrity: sha512-t73xJJrvdTjXrn4jLS9VSGRbz0nUY3cl2DMGDU48lKl+HR9dbbjW2A9r3g40VA++mQpy6uuHg33gy7du2BKpog==}
     dev: true
 
+  /@types/cron/2.0.0:
+    resolution: {integrity: sha512-xZM08fqvwIXgghtPVkSPKNgC+JoMQ2OHazEvyTKnNf7aWu1aB6/4lBbQFrb03Td2cUGG7ITzMv3mFYnMu6xRaQ==}
+    dependencies:
+      '@types/luxon': 3.0.2
+      '@types/node': 16.11.59
+    dev: true
+
   /@types/eslint-scope/3.7.4:
     resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
     dependencies:
@@ -1448,6 +1475,10 @@ packages:
     resolution: {integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==}
     dependencies:
       '@types/node': 16.11.59
+    dev: true
+
+  /@types/luxon/3.0.2:
+    resolution: {integrity: sha512-HM2OVWckUMmXbWYZufmWT2XMURGDZ6XbyNyQ+Lx+gCFGFqbZaIjsz7b+AGeGP/AuVYHBiuGY+wXfweP1RremnA==}
     dev: true
 
   /@types/mime/3.0.1:
@@ -2369,6 +2400,12 @@ packages:
 
   /create-require/1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
+
+  /cron/2.0.0:
+    resolution: {integrity: sha512-RPeRunBCFr/WEo7WLp8Jnm45F/ziGJiHVvVQEBSDTSGu6uHW49b2FOP2O14DcXlGJRLhwE7TIoDzHHK4KmlL6g==}
+    dependencies:
+      luxon: 1.28.0
+    dev: false
 
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -4062,6 +4099,10 @@ packages:
     dependencies:
       yallist: 4.0.0
 
+  /luxon/1.28.0:
+    resolution: {integrity: sha512-TfTiyvZhwBYM/7QdAVDh+7dBTBA29v4ik0Ce9zda3Mnf8on1S5KJI8P2jKFZ8+5C0jhmr0KwJEO/Wdpm0VeWJQ==}
+    dev: false
+
   /macos-release/2.5.0:
     resolution: {integrity: sha512-EIgv+QZ9r+814gjJj0Bt5vSLJLzswGmSUbUpbi9AIr/fsN2IWFBl2NucV9PAiek+U1STK468tEkxmVYUtuAN3g==}
     engines: {node: '>=6'}
@@ -4228,6 +4269,10 @@ packages:
   /neo-async/2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
     dev: true
+
+  /neverthrow/5.0.1:
+    resolution: {integrity: sha512-oibO4xhEP3bqnTTLZ+c8eOaavP4T3HUZuCuWyw+OcwThXD9fOgf7XwkEc5mpvrVhIrhH87JU30CmWzUfBYIUMg==}
+    dev: false
 
   /node-abort-controller/3.0.1:
     resolution: {integrity: sha512-/ujIVxthRs+7q6hsdjHMaj8hRG9NuWmwrz+JdRwZ14jdFoKSkm+vDsCbF9PLpnSqjaWQJuTmVtcWHNLr+vrOFw==}

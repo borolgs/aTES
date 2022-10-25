@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { IEventPublisher } from '@nestjs/cqrs';
 import { ClientKafka, ClientProxyFactory } from '@nestjs/microservices';
 import { Producer } from 'kafkajs';
 import { lastValueFrom } from 'rxjs';
@@ -6,7 +7,7 @@ import { MODULE_OPTIONS_TOKEN } from './client-kafka.module-definition';
 import { ClientKafkaConfig } from './types';
 
 @Injectable()
-export class ClientKafkaService {
+export class ClientKafkaService implements IEventPublisher {
   public client: ClientKafka | null = null;
   public topics: string[];
   constructor(@Inject(MODULE_OPTIONS_TOKEN) private config: ClientKafkaConfig) {
@@ -50,6 +51,7 @@ export class ClientKafkaService {
     if (this.config.mock) {
       return;
     }
+
     const res = await lastValueFrom(this.client!.emit(topic, payload));
     return res;
   }
@@ -61,6 +63,7 @@ export class ClientKafkaService {
     if (this.config.mock) {
       return;
     }
+
     const producer = (this.client as any).producer as Producer;
     const res = await producer.send({
       topic: topic,
@@ -70,5 +73,13 @@ export class ClientKafkaService {
     });
 
     return res;
+  }
+
+  async publish(e: any) {
+    return this.emit(e.topic, e.event);
+  }
+
+  publishAll?(e: any) {
+    return this.emitMutliple(e.topic, e.events);
   }
 }

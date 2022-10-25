@@ -1,11 +1,13 @@
 import { Logger } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Not, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from '../../users';
 import { AssignTasksCommand } from './tasks.commands';
 import { Task } from '../task.entity';
 import { ClientKafkaService } from '@shared/kafka';
+import { EventSchemaRegistryService } from '@shared/event-schema-registry';
+import { TaskEvent } from '../events';
 
 @CommandHandler(AssignTasksCommand)
 export class AssignTasksHandler implements ICommandHandler<AssignTasksCommand> {
@@ -16,14 +18,12 @@ export class AssignTasksHandler implements ICommandHandler<AssignTasksCommand> {
     @InjectRepository(User) private userRepo: Repository<User>,
     private dataSource: DataSource,
     private client: ClientKafkaService,
+    private eventBus: EventBus,
+    private schemaRegistry: EventSchemaRegistryService,
   ) {}
 
   async execute(args: AssignTasksCommand): Promise<any> {
-    const users = await this.userRepo
-      .createQueryBuilder('user')
-      .select()
-      .orderBy('random()')
-      .getMany();
+    const users = await this.userRepo.createQueryBuilder('user').select().orderBy('random()').getMany();
 
     const notCompletedTasks = await this.taskRepo
       .createQueryBuilder('task')
@@ -33,13 +33,11 @@ export class AssignTasksHandler implements ICommandHandler<AssignTasksCommand> {
       .getMany();
 
     const tasksDict = {};
-    const messages: any[] = [];
+    const events: any[] = [];
 
     await this.dataSource.transaction(async (manager) => {
       while (notCompletedTasks.length) {
-        const randomTaskIdx = Math.floor(
-          Math.random() * notCompletedTasks.length,
-        );
+        const randomTaskIdx = Math.floor(Math.random() * notCompletedTasks.length);
         const randomUserIdx = Math.floor(Math.random() * users.length);
 
         const task = notCompletedTasks[randomTaskIdx];
@@ -51,13 +49,11 @@ export class AssignTasksHandler implements ICommandHandler<AssignTasksCommand> {
         await manager.save(task);
         await manager.save(user);
 
-        messages.push({
-          name: 'TaskAssigned',
-          data: {
-            description: task.description,
-            assigneeId: user.publicId,
-          },
-        });
+        TaskEvent.createTaskAssignedEvent('task', {
+          taskId: task.publicId,
+          description: task.description,
+          assigneeId: user.publicId,
+        }).map(({ event }) => events.push(event));
 
         if (tasksDict[user.publicId]) {
           tasksDict[user.publicId].push(task.publicId);
@@ -67,7 +63,12 @@ export class AssignTasksHandler implements ICommandHandler<AssignTasksCommand> {
       }
     });
 
-    await this.client.emitMutliple('task', messages);
+    if (events[0]) {
+      await this.schemaRegistry
+        .validate(events[0], 'tasks.assigned', 1)
+        .mapErr((err) => this.logger.error(err.message, err.validationErrors))
+        .asyncMap(() => this.client.emitMutliple('task', events));
+    }
 
     this.logger.debug('Assign free tasks');
 

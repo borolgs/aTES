@@ -3,8 +3,9 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/auth/src",
   "compilerOptions": {
-    "webpack": true,
-    "tsConfigPath": "apps/auth/tsconfig.app.json"
+    "tsConfigPath": "apps/auth/tsconfig.app.json",
+    "assets": ["**/*.json"],
+    "watchAssets": true
   },
   "monorepo": true,
   "root": "apps/auth",
@@ -34,6 +35,15 @@
       "sourceRoot": "libs/shared/src",
       "compilerOptions": {
         "tsConfigPath": "libs/shared/tsconfig.lib.json"
+      }
+    },
+    "accounting": {
+      "type": "application",
+      "root": "apps/accounting",
+      "entryFile": "main",
+      "sourceRoot": "apps/accounting/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/accounting/tsconfig.app.json"
       }
     }
   }

@@ -1,0 +1,22 @@
+
+@baseUrl = http://localhost:5000
+
+# get token using http://localhost:5000/login
+# @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImlhdCI6MTY2NjUyMDI1OCwiZXhwIjoxNjY2NjA2NjU4fQ.UWqh7fTGV0CgaO10RRNBEgAhcbycQkW1NLhjlnPYpbM
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY2NjUyMjgzNSwiZXhwIjoxNjY2NjA5MjM1fQ.O9Z9wVfKQV9c7XbZ--dRfAJ_EHvmz2m-VKnulkCXivM
+
+###
+
+# open in browser
+GET {{baseUrl}}/login
+
+###
+
+GET {{baseUrl}}/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+###
+
+GET {{baseUrl}}/transactions?accountId=1cd0ffa7-a8c9-4575-932e-8ff97f6d0925
+Content-Type: application/json
+Authorization: Bearer {{token}} 

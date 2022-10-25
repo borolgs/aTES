@@ -15,7 +15,11 @@ export interface IUser {
 }
 
 export type UserCreatedEvent = {
-  name: 'AccountCreated' | 'AccountUpdated' | 'AccountDeleted';
+  eventId: string;
+  eventVersion: number;
+  eventName: 'AccountCreated' | 'AccountUpdated' | 'AccountDeleted';
+  eventTime: string;
+  producer: string;
   data: IUser;
 };
 
@@ -31,6 +35,8 @@ export type TaskStatus = typeof taskStatuses[number];
 export interface ITask {
   publicId: TaskId;
   assignee: IUser | null;
+  title?: string;
+  jiraId?: string;
   description: string;
   status: TaskStatus;
 }
@@ -44,6 +50,8 @@ export type FindTasksResponse = {
 
 export interface CreateTaskParameters {
   assigneeId?: UserId;
+  title?: string;
+  jiraId?: string;
   description: string;
   status?: TaskStatus;
 }

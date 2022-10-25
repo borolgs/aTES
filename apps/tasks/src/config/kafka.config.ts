@@ -11,7 +11,7 @@ export const kafkaConfig = registerAs(
         brokers: [process.env.KAFKA_BROKER ?? 'localhost:29092'],
       },
       consumer: {
-        groupId: process.env.KAFKA_GROUP_ID ?? 'some-group-id',
+        groupId: process.env.KAFKA_GROUP_ID ?? '2',
       },
     },
   }),

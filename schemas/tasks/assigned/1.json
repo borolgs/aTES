@@ -1,0 +1,36 @@
+{
+  "title": "Tasks.Assigned.v1",
+  "description": "json schema for BE Task Assigned (version 1)",
+
+  "$defs": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "assigneeId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["taskId", "assigneeId", "description"]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "eventId": { "type": "string" },
+    "eventVersion": { "enum": [1] },
+    "eventName": { "enum": ["TaskAssigned"] },
+    "eventTime": { "type": "string" },
+    "producer": { "type": "string" },
+
+    "data": { "$ref": "#/$defs/event_data" }
+  },
+
+  "required": ["eventId", "eventVersion", "eventName", "eventTime", "producer", "data"]
+}
